@@ -24,10 +24,14 @@ jobs:
 
       - name: Build site
         run: |
-          mkdir -p dista/staging
-          # Production version (root)
+          # Create ALL required directories
+          mkdir -p dist
+          mkdir -p dist/staging
+          
+          # Create production file
           echo "<h1>PRODUCTION SITE</h1>" > dist/index.html
-          # Staging version (subfolder)
+          
+          # Create staging file
           echo "<h1>STAGING SITE</h1>" > dist/staging/index.html
 
       - name: Run tests
