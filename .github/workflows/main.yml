@@ -1,10 +1,10 @@
-name: CI/CD Pipeline
+name: CI/CD Pipeline - Staging
 
 on:
   push:
-    branches: [ "main" ]          # Deploy only on main
+    branches: [ "main", "staging" ]
   pull_request:
-    branches: [ "main" ]          # Build + test before merge
+    branches: [ "main" ]
 
 permissions:
   contents: read
@@ -12,47 +12,48 @@ permissions:
   id-token: write
 
 jobs:
+
   # -----------------------
-  # BUILD + TEST (CI)
+  # BUILD + TEST
   # -----------------------
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Build site
         run: |
-          echo "Building site..."
-          # Future: npm run build
+          # Create ALL required directories
+          mkdir -p dist
+          mkdir -p dist/staging
+          
+          # Create production file
+          echo "<h1>PRODUCTION SITE</h1>" > dist/index.html
+          
+          # Create staging file
+          echo "<h1>STAGING SITE</h1>" > dist/staging/index.html
 
       - name: Run tests
-        run: |
-          echo "Running tests..."
-          # Future: npm test OR lint checks
+        run: echo "Running tests..."
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .
+          path: ./dist
 
   # -----------------------
-  # DEPLOY (CD)
+  # STAGING DEPLOY
   # -----------------------
-  deploy:
-    if: github.event_name == 'push'   # 👈 Only deploy on push (not PR)
+  deploy-staging:
+    if: github.ref == 'refs/heads/staging'
     needs: build
     runs-on: ubuntu-latest
 
-    permissions:
-      pages: write
-      id-token: write
-
     environment:
-      name: github-pages
+      name: staging
 
     steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Deploy to staging
+        run: |
+          echo "Deploying to staging environment"
