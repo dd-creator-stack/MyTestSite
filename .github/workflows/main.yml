@@ -1,8 +1,10 @@
-name: Deploy Website
+name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main" ]          # Deploy only on main
+  pull_request:
+    branches: [ "main" ]          # Build + test before merge
 
 permissions:
   contents: read
@@ -11,7 +13,7 @@ permissions:
 
 jobs:
   # -----------------------
-  # BUILD STAGE
+  # BUILD + TEST (CI)
   # -----------------------
   build:
     runs-on: ubuntu-latest
@@ -22,8 +24,13 @@ jobs:
 
       - name: Build site
         run: |
-          echo "Simulating build step"
-          # In future: npm run build OR generate static files
+          echo "Building site..."
+          # Future: npm run build
+
+      - name: Run tests
+        run: |
+          echo "Running tests..."
+          # Future: npm test OR lint checks
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
@@ -31,10 +38,11 @@ jobs:
           path: .
 
   # -----------------------
-  # DEPLOY STAGE
+  # DEPLOY (CD)
   # -----------------------
   deploy:
-    needs: build   # 👈 This is key
+    if: github.event_name == 'push'   # 👈 Only deploy on push (not PR)
+    needs: build
     runs-on: ubuntu-latest
 
     permissions:
@@ -48,3 +56,4 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+``
