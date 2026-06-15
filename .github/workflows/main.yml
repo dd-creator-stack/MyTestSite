@@ -3,8 +3,6 @@ name: CI/CD Pipeline
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
 
 permissions:
   contents: read
@@ -13,39 +11,44 @@ permissions:
 
 jobs:
 
+  # BUILD
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Build site (with staging)
+      - name: Build site
         run: |
           mkdir -p dist/staging
 
           echo "<h1>PRODUCTION SITE</h1>" > dist/index.html
           echo "<h1>STAGING SITE</h1>" > dist/staging/index.html
 
-          echo "DEBUG OUTPUT:"
-          ls -R dist
-
-      - name: Run tests
-        run: echo "Running tests..."
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v3
         with:
           path: ./dist
 
-  deploy:
+  # ✅ STAGING DEPLOY (runs automatically)
+  deploy-staging:
     needs: build
     runs-on: ubuntu-latest
 
     environment:
-      name: github-pages
+      name: staging
 
     steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
+      - name: Deploy to staging
+        uses: actions/deploy-pages@v4
+
+  # ✅ PRODUCTION DEPLOY (requires approval)
+  deploy-production:
+    needs: deploy-staging
+    runs-on: ubuntu-latest
+
+    environment:
+      name: github-pages   # approval enabled here
+
+    steps:
+      - name: Deploy to production
         uses: actions/deploy-pages@v4
