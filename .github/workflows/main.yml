@@ -2,7 +2,7 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ "main", "staging" ]
+    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
 
@@ -20,38 +20,3 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Build site
-        run: |
-          mkdir -p dist/staging
-          
-          echo "<h1>PRODUCTION SITE</h1>" > dist/index.html
-          echo "<h1>STAGING SITE</h1>" > dist/staging/index.html
-          
-          echo "DEBUG OUTPUT:"
-          ls -R dist
-          
-      - name: Run tests
-        run: echo "Running tests..."
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: ./dist
-
-  # -----------------------
-  # STAGING DEPLOY
-  # -----------------------
-  deploy-staging:
-    if: github.ref == 'refs/heads/staging'
-    needs: build
-    runs-on: ubuntu-latest
-
-    environment:
-      name: staging
-
-    steps:
-      - name: Deploy to staging
-        run: |
-          echo "Deploying to staging environment"
