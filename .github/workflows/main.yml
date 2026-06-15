@@ -24,16 +24,14 @@ jobs:
 
       - name: Build site
         run: |
-          # Create ALL required directories
-          mkdir -p dist
           mkdir -p dist/staging
           
-          # Create production file
           echo "<h1>PRODUCTION SITE</h1>" > dist/index.html
-          
-          # Create staging file
           echo "<h1>STAGING SITE</h1>" > dist/staging/index.html
-
+          
+          echo "DEBUG OUTPUT:"
+          ls -R dist
+          
       - name: Run tests
         run: echo "Running tests..."
 
