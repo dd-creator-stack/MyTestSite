@@ -24,8 +24,11 @@ jobs:
 
       - name: Build site
         run: |
-          mkdir dist
-          echo "<h1>My Site</h1>" > dist/index.html
+          mkdir -p dista/staging
+          # Production version (root)
+          echo "<h1>PRODUCTION SITE</h1>" > dist/index.html
+          # Staging version (subfolder)
+          echo "<h1>STAGING SITE</h1>" > dist/staging/index.html
 
       - name: Run tests
         run: echo "Running tests..."
